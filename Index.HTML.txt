@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZC Shop Enterprise</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: skyblue;
+            color: black;
+            font-size: 12px;
+            overflow-x: hidden;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: transparent;
+            padding: 10px 20px;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .marquee {
+            color: white;
+            font-size: 16px;
+            white-space: nowrap;
+            animation: marquee 30s linear infinite;
+        }
+        
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        /* Welcome Screen */
+        .welcome-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        
+        .welcome-content {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .welcome-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 5cm;
+            height: 1cm;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 15cm;
+            max-width: 90%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .close-btn {
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            width: 5cm;
+            height: 1cm;
+        }
+        
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        /* Dashboard Styles */
+        .dashboard {
+            display: none;
+            padding: 60px 20px 20px;
+        }
+        
+        .dashboard-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .dashboard-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .dashboard-btn {
+            width: 5cm;
+            height: 1cm;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: center;
+            line-height: 1cm;
+            margin: 0 auto;
+        }
+        
+        .logout-btn {
+            background-color: #f44336;
+            animation: slideRight 0.5s ease-in-out;
+        }
+        
+        @keyframes slideRight {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(100px); }
+        }
+        
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        .report-footer {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: right;
+        }
+        
+        /* Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-section, .print-section * {
+                visibility: visible;
+            }
+            .print-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+        
+        .transaction-table {
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: block;
+        }
+        
+        .balance-positive {
+            color: green;
+            font-weight: bold;
+        }
+        
+        .balance-negative {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="marquee">Hello World I am Zamman (Wahidul Zaman)</div>
+    </div>
+    
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-content">
+            <h1>Welcome to ZC Shop Enterprise</h1>
+            <p>Your trusted partner for all your needs</p>
+            <button class="welcome-btn" onclick="openLoginModal()">Click here to login</button>
+        </div>
+    </div>
+    
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeLoginModal()">&times;</span>
+            <h2>Login to ZC Shop Enterprise</h2>
+            <div class="form-group">
+                <label for="loginEmail">Email/Mobile Number</label>
+                <input type="text" id="loginEmail" placeholder="Enter email or mobile number">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password">
+            </div>
+            <div class="form-buttons">
+                <button class="btn btn-primary" onclick="login()">Login</button>
+                <button class="btn btn-secondary" onclick="openSignupModal()">Sign Up</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Signup Modal -->
+    <div class="modal" id="signupModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeSignupModal()">&times;</span>
+            <h2>Create New Account</h2>
+            <div class="form-group">
+                <label for="signupName">Full Name</label>
+                <input type="text" id="signupName" placeholder="Enter full name">
+            </div>
+            <div class="form-group">
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label for="signupMobile">Mobile Number</label>
+                <input type="text" id="signupMobile" placeholder="Enter mobile number">
+            </div>
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" placeholder="Enter password">
+            </div>
+            <div class="form-buttons">
+                <button class="btn btn-primary" onclick="signup()">Sign Up</button>
+                <button class="btn btn-secondary" onclick="closeSignupModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <h1 class="dashboard-title">Welcome to ZC Dashboard</h1>
+        <div class="dashboard-buttons">
+            <button class="dashboard-btn" onclick="openCustomerEntryModal()">New Customer Entry</button>
+            <button class="dashboard-btn" onclick="openCashEntryModal()">Customer Cash Entry</button>
+            <button class="dashboard-btn" onclick="openLedgerReportModal()">Customer Ledger Report</button>
+            <button class="dashboard-btn" onclick="openCustomerEditModal()">Customer Details Edit/Delete</button>
+            <button class="dashboard-btn" onclick="openPrintPreviewModal()">Print/Preview</button>
+            <button class="dashboard-btn logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+    
+    <!-- Customer Entry Modal -->
+    <div class="modal" id="customerEntryModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeCustomerEntryModal()">&times;</span>
+            <h2>New Customer Entry</h2>
+            <div class="form-group">
+                <label for="customerName">Customer Name</label>
+                <input type="text" id="customerName" placeholder="Enter customer name">
+            </div>
+            <div class="form-group">
+                <label for="customerAddress">Address</label>
+                <input type="text" id="customerAddress" placeholder="Enter address">
+            </div>
+            <div class="form-group">
+                <label for="customerPhone">Phone Number</label>
+                <input type="text" id="customerPhone" placeholder="Enter phone number">
+            </div>
+            <div class="form-group">
+                <label for="customerEmail">Email</label>
+                <input type="email" id="customerEmail" placeholder="Enter email">
+            </div>
+            <div class="form-buttons">
+                <button class="btn btn-primary" onclick="saveCustomer()">Save</button>
+                <button class="btn btn-secondary" onclick="closeCustomerEntryModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cash Entry Modal -->
+    <div class="modal" id="cashEntryModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeCashEntryModal()">&times;</span>
+            <h2>Customer Cash Entry</h2>
+            <div class="form-group">
+                <label for="cashCustomer">Select Customer</label>
+                <select id="cashCustomer">
+                    <option value="">Select customer</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="transactionType">Transaction Type</label>
+                <select id="transactionType">
+                    <option value="debit">Debit (Customer Owes)</option>
+                    <option value="credit">Credit (Customer Payment)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <input type="number" id="amount" placeholder="Enter amount">
+            </div>
+            <div class="form-group">
+                <label for="transactionDate">Date</label>
+                <input type="date" id="transactionDate">
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <input type="text" id="description" placeholder="Enter description">
+            </div>
+            <div class="form-buttons">
+                <button class="btn btn-primary" onclick="saveTransaction()">Save</button>
+                <button class="btn btn-secondary" onclick="closeCashEntryModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Ledger Report Modal -->
+    <div class="modal" id="ledgerReportModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeLedgerReportModal()">&times;</span>
+            <h2>Customer Ledger Report</h2>
+            <div class="form-group">
+                <label for="reportCustomer">Select Customer</label>
+                <select id="reportCustomer" onchange="generateLedgerReport()">
+                    <option value="">Select customer</option>
+                </select>
+            </div>
+            <div id="ledgerReportContent">
+                <!-- Ledger report will be generated here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Customer Edit Modal -->
+    <div class="modal" id="customerEditModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeCustomerEditModal()">&times;</span>
+            <h2>Customer Details Edit/Delete</h2>
+            <div class="form-group">
+                <label for="editCustomer">Select Customer</label>
+                <select id="editCustomer" onchange="loadCustomerDetails()">
+                    <option value="">Select customer</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="editCustomerName">Customer Name</label>
+                <input type="text" id="editCustomerName" placeholder="Enter customer name">
+            </div>
+            <div class="form-group">
+                <label for="editCustomerAddress">Address</label>
+                <input type="text" id="editCustomerAddress" placeholder="Enter address">
+            </div>
+            <div class="form-group">
+                <label for="editCustomerPhone">Phone Number</label>
+                <input type="text" id="editCustomerPhone" placeholder="Enter phone number">
+            </div>
+            <div class="form-group">
+                <label for="editCustomerEmail">Email</label>
+                <input type="email" id="editCustomerEmail" placeholder="Enter email">
+            </div>
+            <div class="form-buttons">
+                <button class="btn btn-primary" onclick="updateCustomer()">Update</button>
+                <button class="btn btn-secondary" onclick="deleteCustomer()">Delete</button>
+                <button class="btn" onclick="closeCustomerEditModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Print Preview Modal -->
+    <div class="modal" id="printPreviewModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closePrintPreviewModal()">&times;</span>
+            <h2>Print Preview</h2>
+            <div class="form-group">
+                <label for="printCustomer">Select Customer</label>
+                <select id="printCustomer" onchange="generatePrintPreview()">
+                    <option value="">Select customer</option>
+                </select>
+            </div>
+            <div id="printPreviewContent" class="print-section">
+                <!-- Print preview will be generated here -->
+            </div>
+            <div class="form-buttons no-print">
+                <button class="btn btn-primary" onclick="window.print()">Print</button>
+                <button class="btn btn-secondary" onclick="closePrintPreviewModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let users = JSON.parse(localStorage.getItem('zcUsers')) || [];
+        let customers = JSON.parse(localStorage.getItem('zcCustomers')) || [];
+        let transactions = JSON.parse(localStorage.getItem('zcTransactions')) || [];
+        let currentUser = null;
+        
+        // DOM Elements
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const dashboard = document.getElementById('dashboard');
+        const loginModal = document.getElementById('loginModal');
+        const signupModal = document.getElementById('signupModal');
+        const customerEntryModal = document.getElementById('customerEntryModal');
+        const cashEntryModal = document.getElementById('cashEntryModal');
+        const ledgerReportModal = document.getElementById('ledgerReportModal');
+        const customerEditModal = document.getElementById('customerEditModal');
+        const printPreviewModal = document.getElementById('printPreviewModal');
+        
+        // Initialize date fields
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('transactionDate').valueAsDate = new Date();
+            
+            // Check if user is already logged in
+            const savedUser = localStorage.getItem('zcCurrentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                welcomeScreen.style.display = 'none';
+                dashboard.style.display = 'block';
+            }
+        });
+        
+        // Modal functions
+        function openLoginModal() {
+            loginModal.style.display = 'flex';
+        }
+        
+        function closeLoginModal() {
+            loginModal.style.display = 'none';
+        }
+        
+        function openSignupModal() {
+            signupModal.style.display = 'flex';
+            loginModal.style.display = 'none';
+        }
+        
+        function closeSignupModal() {
+            signupModal.style.display = 'none';
+            loginModal.style.display = 'flex';
+        }
+        
+        function openCustomerEntryModal() {
+            customerEntryModal.style.display = 'flex';
+        }
+        
+        function closeCustomerEntryModal() {
+            customerEntryModal.style.display = 'none';
+            // Clear form
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerAddress').value = '';
+            document.getElementById('customerPhone').value = '';
+            document.getElementById('customerEmail').value = '';
+        }
+        
+        function openCashEntryModal() {
+            cashEntryModal.style.display = 'flex';
+            populateCustomerDropdown('cashCustomer');
+        }
+        
+        function closeCashEntryModal() {
+            cashEntryModal.style.display = 'none';
+            // Clear form
+            document.getElementById('cashCustomer').value = '';
+            document.getElementById('transactionType').value = 'debit';
+            document.getElementById('amount').value = '';
+            document.getElementById('transactionDate').valueAsDate = new Date();
+            document.getElementById('description').value = '';
+        }
+        
+        function openLedgerReportModal() {
+            ledgerReportModal.style.display = 'flex';
+            populateCustomerDropdown('reportCustomer');
+        }
+        
+        function closeLedgerReportModal() {
+            ledgerReportModal.style.display = 'none';
+            document.getElementById('reportCustomer').value = '';
+            document.getElementById('ledgerReportContent').innerHTML = '';
+        }
+        
+        function openCustomerEditModal() {
+            customerEditModal.style.display = 'flex';
+            populateCustomerDropdown('editCustomer');
+        }
+        
+        function closeCustomerEditModal() {
+            customerEditModal.style.display = 'none';
+            document.getElementById('editCustomer').value = '';
+            document.getElementById('editCustomerName').value = '';
+            document.getElementById('editCustomerAddress').value = '';
+            document.getElementById('editCustomerPhone').value = '';
+            document.getElementById('editCustomerEmail').value = '';
+        }
+        
+        function openPrintPreviewModal() {
+            printPreviewModal.style.display = 'flex';
+            populateCustomerDropdown('printCustomer');
+        }
+        
+        function closePrintPreviewModal() {
+            printPreviewModal.style.display = 'none';
+            document.getElementById('printCustomer').value = '';
+            document.getElementById('printPreviewContent').innerHTML = '';
+        }
+        
+        // Populate customer dropdown
+        function populateCustomerDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.innerHTML = '<option value="">Select customer</option>';
+            
+            customers.forEach(customer => {
+                const option = document.createElement('option');
+                option.value = customer.id;
+                option.textContent = customer.name;
+                dropdown.appendChild(option);
+            });
+        }
+        
+        // User authentication functions
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                alert('Please enter both email/mobile and password');
+                return;
+            }
+            
+            const user = users.find(u => 
+                (u.email === email || u.mobile === email) && u.password === password
+            );
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('zcCurrentUser', JSON.stringify(user));
+                closeLoginModal();
+                welcomeScreen.style.display = 'none';
+                dashboard.style.display = 'block';
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+            } else {
+                alert('Invalid credentials. Please try again.');
+            }
+        }
+        
+        function signup() {
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const mobile = document.getElementById('signupMobile').value;
+            const password = document.getElementById('signupPassword').value;
+            
+            if (!name || !email || !mobile || !password) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            // Check if user already exists
+            if (users.some(u => u.email === email || u.mobile === mobile)) {
+                alert('User with this email or mobile already exists');
+                return;
+            }
+            
+            const newUser = {
+                id: Date.now(),
+                name,
+                email,
+                mobile,
+                password
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('zcUsers', JSON.stringify(users));
+            
+            alert('Account created successfully. Please login.');
+            closeSignupModal();
+            openLoginModal();
+            
+            // Clear form
+            document.getElementById('signupName').value = '';
+            document.getElementById('signupEmail').value = '';
+            document.getElementById('signupMobile').value = '';
+            document.getElementById('signupPassword').value = '';
+        }
+        
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('zcCurrentUser');
+            dashboard.style.display = 'none';
+            welcomeScreen.style.display = 'flex';
+        }
+        
+        // Customer management functions
+        function saveCustomer() {
+            const name = document.getElementById('customerName').value;
+            const address = document.getElementById('customerAddress').value;
+            const phone = document.getElementById('customerPhone').value;
+            const email = document.getElementById('customerEmail').value;
+            
+            if (!name) {
+                alert('Customer name is required');
+                return;
+            }
+            
+            const newCustomer = {
+                id: Date.now(),
+                name,
+                address,
+                phone,
+                email
+            };
+            
+            customers.push(newCustomer);
+            localStorage.setItem('zcCustomers', JSON.stringify(customers));
+            
+            alert('Customer saved successfully');
+            closeCustomerEntryModal();
+        }
+        
+        function saveTransaction() {
+            const customerId = parseInt(document.getElementById('cashCustomer').value);
+            const type = document.getElementById('transactionType').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const date = document.getElementById('transactionDate').value;
+            const description = document.getElementById('description').value;
+            
+            if (!customerId || !amount || !date) {
+                alert('Please fill all required fields');
+                return;
+            }
+            
+            if (amount <= 0) {
+                alert('Amount must be greater than zero');
+                return;
+            }
+            
+            const newTransaction = {
+                id: Date.now(),
+                customerId,
+                type,
+                amount,
+                date,
+                description
+            };
+            
+            transactions.push(newTransaction);
+            localStorage.setItem('zcTransactions', JSON.stringify(transactions));
+            
+            alert('Transaction saved successfully');
+            closeCashEntryModal();
+        }
+        
+        function generateLedgerReport() {
+            const customerId = parseInt(document.getElementById('reportCustomer').value);
+            
+            if (!customerId) {
+                document.getElementById('ledgerReportContent').innerHTML = '';
+                return;
+            }
+            
+            const customer = customers.find(c => c.id === customerId);
+            const customerTransactions = transactions.filter(t => t.customerId === customerId)
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            let debitTotal = 0;
+            let creditTotal = 0;
+            
+            let html = `
+                <h3>Ledger Report for ${customer.name}</h3>
+                <div class="transaction-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Debit</th>
+                            <th>Credit</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            let balance = 0;
+            
+            customerTransactions.forEach(transaction => {
+                const debit = transaction.type === 'debit' ? transaction.amount : 0;
+                const credit = transaction.type === 'credit' ? transaction.amount : 0;
+                
+                debitTotal += debit;
+                creditTotal += credit;
+                balance += (debit - credit);
+                
+                const balanceClass = balance >= 0 ? 'balance-positive' : 'balance-negative';
+                
+                html += `
+                    <tr>
+                        <td>${formatDate(transaction.date)}</td>
+                        <td>${transaction.description}</td>
+                        <td>${debit.toFixed(2)}</td>
+                        <td>${credit.toFixed(2)}</td>
+                        <td class="${balanceClass}">${balance.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+                </div>
+                <div class="report-footer">
+                    <p>Total Debit: ₹${debitTotal.toFixed(2)}</p>
+                    <p>Total Credit: ₹${creditTotal.toFixed(2)}</p>
+                    <p>Net Balance: ₹${(debitTotal - creditTotal).toFixed(2)}</p>
+                </div>
+            `;
+            
+            document.getElementById('ledgerReportContent').innerHTML = html;
+        }
+        
+        function loadCustomerDetails() {
+            const customerId = parseInt(document.getElementById('editCustomer').value);
+            
+            if (!customerId) {
+                document.getElementById('editCustomerName').value = '';
+                document.getElementById('editCustomerAddress').value = '';
+                document.getElementById('editCustomerPhone').value = '';
+                document.getElementById('editCustomerEmail').value = '';
+                return;
+            }
+            
+            const customer = customers.find(c => c.id === customerId);
+            
+            if (customer) {
+                document.getElementById('editCustomerName').value = customer.name;
+                document.getElementById('editCustomerAddress').value = customer.address || '';
+                document.getElementById('editCustomerPhone').value = customer.phone || '';
+                document.getElementById('editCustomerEmail').value = customer.email || '';
+            }
+        }
+        
+        function updateCustomer() {
+            const customerId = parseInt(document.getElementById('editCustomer').value);
+            
+            if (!customerId) {
+                alert('Please select a customer');
+                return;
+            }
+            
+            const name = document.getElementById('editCustomerName').value;
+            
+            if (!name) {
+                alert('Customer name is required');
+                return;
+            }
+            
+            const customerIndex = customers.findIndex(c => c.id === customerId);
+            
+            if (customerIndex !== -1) {
+                customers[customerIndex].name = name;
+                customers[customerIndex].address = document.getElementById('editCustomerAddress').value;
+                customers[customerIndex].phone = document.getElementById('editCustomerPhone').value;
+                customers[customerIndex].email = document.getElementById('editCustomerEmail').value;
+                
+                localStorage.setItem('zcCustomers', JSON.stringify(customers));
+                alert('Customer updated successfully');
+                closeCustomerEditModal();
+            }
+        }
+        
+        function deleteCustomer() {
+            const customerId = parseInt(document.getElementById('editCustomer').value);
+            
+            if (!customerId) {
+                alert('Please select a customer');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to delete this customer? This will also delete all associated transactions.')) {
+                // Remove customer
+                customers = customers.filter(c => c.id !== customerId);
+                localStorage.setItem('zcCustomers', JSON.stringify(customers));
+                
+                // Remove associated transactions
+                transactions = transactions.filter(t => t.customerId !== customerId);
+                localStorage.setItem('zcTransactions', JSON.stringify(transactions));
+                
+                alert('Customer deleted successfully');
+                closeCustomerEditModal();
+            }
+        }
+        
+        function generatePrintPreview() {
+            const customerId = parseInt(document.getElementById('printCustomer').value);
+            
+            if (!customerId) {
+                document.getElementById('printPreviewContent').innerHTML = '';
+                return;
+            }
+            
+            const customer = customers.find(c => c.id === customerId);
+            const customerTransactions = transactions.filter(t => t.customerId === customerId)
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            let debitTotal = 0;
+            let creditTotal = 0;
+            
+            let html = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h1>ZC Shop Enterprise</h1>
+                    <h2>Customer Ledger Report</h2>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <p><strong>Customer:</strong> ${customer.name}</p>
+                    <p><strong>Address:</strong> ${customer.address || 'N/A'}</p>
+                    <p><strong>Phone:</strong> ${customer.phone || 'N/A'}</p>
+                    <p><strong>Email:</strong> ${customer.email || 'N/A'}</p>
+                    <p><strong>Report Date:</strong> ${formatDate(new Date())}</p>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Debit (₹)</th>
+                            <th>Credit (₹)</th>
+                            <th>Balance (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            let balance = 0;
+            
+            customerTransactions.forEach(transaction => {
+                const debit = transaction.type === 'debit' ? transaction.amount : 0;
+                const credit = transaction.type === 'credit' ? transaction.amount : 0;
+                
+                debitTotal += debit;
+                creditTotal += credit;
+                balance += (debit - credit);
+                
+                html += `
+                    <tr>
+                        <td>${formatDate(transaction.date)}</td>
+                        <td>${transaction.description}</td>
+                        <td>${debit.toFixed(2)}</td>
+                        <td>${credit.toFixed(2)}</td>
+                        <td>${balance.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+                <div class="report-footer">
+                    <p><strong>Total Debit: ₹${debitTotal.toFixed(2)}</strong></p>
+                    <p><strong>Total Credit: ₹${creditTotal.toFixed(2)}</strong></p>
+                    <p><strong>Net Balance: ₹${(debitTotal - creditTotal).toFixed(2)}</strong></p>
+                </div>
+            `;
+            
+            document.getElementById('printPreviewContent').innerHTML = html;
+        }
+        
+        // Utility function to format dates
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN');
+        }
+    </script>
+</body>
+</html>
